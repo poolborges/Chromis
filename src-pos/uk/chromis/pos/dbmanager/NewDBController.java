@@ -174,9 +174,7 @@ public class NewDBController implements Initializable {
                     String url = dbURL.getText();
                     String user = dbUser.getText();
                     String password = dbPassword.getText();
-                    ClassLoader cloader = new URLClassLoader(new URL[]{new File(driverlib).toURI().toURL()});
-                    DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(driver, true, cloader).newInstance()));
-
+                    
                     session = SessionFactory.getInstance().getSession();
                     connection = session.getConnection();
                     boolean isValid;
@@ -199,14 +197,6 @@ public class NewDBController implements Initializable {
                         });
                     }
                 } catch (SQLException e) {
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            lblProgressMsg.setText("Unable to connect to the database!!");
-                            lblProgressMsg.setTextFill(Color.web("#FF0000"));
-                        }
-                    });
-                } catch (MalformedURLException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
@@ -265,14 +255,7 @@ public class NewDBController implements Initializable {
             @Override
             protected Object call() throws Exception {
                 try {
-                    String driverlib = dbDriverLibrary.getText();
-                    String driver = dbDriverClass.getText();
-                    String url = dbURL.getText();
-                    String user = dbUser.getText();
-                    String password = dbPassword.getText();
-                    ClassLoader cloader = new URLClassLoader(new URL[]{new File(driverlib).toURI().toURL()});
-                    DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(driver, true, cloader).newInstance()));
-
+                    
                     session = SessionFactory.getInstance().getSession();
                     connection = session.getConnection();                   
                     boolean isValid;
@@ -331,7 +314,7 @@ public class NewDBController implements Initializable {
                             testDB.setDisable(false);
                         }
                     });
-                } catch (MalformedURLException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                } catch (Exception e) {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
