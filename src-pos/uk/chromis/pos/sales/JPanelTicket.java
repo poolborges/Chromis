@@ -22,8 +22,6 @@
  */
 package uk.chromis.pos.sales;
 
-import bsh.EvalError;
-import bsh.Interpreter;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -3105,17 +3103,18 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
 // John L - replace older SendOrder script        
         AutoLogoff.getInstance().deactivateTimer();
         if (!m_oTicket.getTicketType().equals(TicketType.REFUND)) {
-            String rScript = (dlSystem.getResourceAsText("script.SendOrder"));
-            Interpreter i = new Interpreter();
+            String rScript = dlSystem.getResourceAsText("script.SendOrder");
+            
             try {
-                i.set("ticket", m_oTicket);
-                i.set("place", m_oTicketExt);
-                i.set("user", m_App.getAppUserView().getUser());
-                i.set("sales", this);
-                i.set("pickupid", m_oTicket.getPickupId());
+                ScriptEngine i = ScriptFactory.getScriptEngine(ScriptFactory.BEANSHELL);
+                i.put("ticket", m_oTicket);
+                i.put("place", m_oTicketExt);
+                i.put("user", m_App.getAppUserView().getUser());
+                i.put("sales", this);
+                i.put("pickupid", m_oTicket.getPickupId());
                 Object result;
                 result = i.eval(rScript);
-            } catch (EvalError ex) {
+            } catch (ScriptException ex) {
                 Logger.getLogger(JPanelTicket.class.getName()).log(Level.SEVERE, null, ex);
             }
 

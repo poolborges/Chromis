@@ -24,8 +24,6 @@
 
 package uk.chromis.pos.sales.restaurant;
 
-import bsh.EvalError;
-import bsh.Interpreter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,7 +75,6 @@ public class JTicketsBagRestaurant extends javax.swing.JPanel {
     private ListKeyed taxcollection;
     private TaxesLogic taxeslogic;
 
-    private Interpreter i;
 
     /**
      * Creates new form JTicketsBagRestaurantMap
@@ -247,16 +244,16 @@ public class JTicketsBagRestaurant extends javax.swing.JPanel {
 // This replaces the code from the buttons script
         if (!ticket.getTicketType().equals(TicketType.REFUND)) {
             ticket = m_restaurant.getActiveTicket();
-            String rScript = (m_dlSystem.getResourceAsText("script.SendOrder"));
+            String rScript = m_dlSystem.getResourceAsText("script.SendOrder");
 
-            Interpreter i = new Interpreter();
             try {
-                i.set("ticket", ticket);
-                i.set("place", m_restaurant.getTableName());
-                i.set("user", m_App.getAppUserView().getUser());
-                i.set("sales", this);
+                ScriptEngine i = ScriptFactory.getScriptEngine(ScriptFactory.BEANSHELL);
+                i.put("ticket", ticket);
+                i.put("place", m_restaurant.getTableName());
+                i.put("user", m_App.getAppUserView().getUser());
+                i.put("sales", this);
                 Object result = i.eval(rScript);
-            } catch (EvalError ex) {
+            } catch (ScriptException ex) {
                 Logger.getLogger(JPanelTicket.class.getName()).log(Level.SEVERE, null, ex);
             }
             // Autologoff after printing to kitchen                                
