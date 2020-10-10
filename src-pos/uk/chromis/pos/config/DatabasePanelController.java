@@ -169,9 +169,10 @@ public class DatabasePanelController implements Initializable, BaseController {
 
     private void loadStyle(WebEngine node) {
         try {
-            final String resource = Paths.get(System.getProperty("user.dir") + "/cssStyles/Chromis-webview.css").toUri().toURL().toExternalForm();
+            final String resource = getClass().getResource("/Chromis-webview.css").toExternalForm();
+            //final String resource = Paths.get(System.getProperty("user.dir") + "Chromis-webview.css").toUri().toURL().toExternalForm();
             node.setUserStyleSheetLocation(resource);
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             System.out.println("No Chromis-webview.css File found !");
         }
     }
@@ -183,9 +184,6 @@ public class DatabasePanelController implements Initializable, BaseController {
             String url = dbURL.getText();
             String user = dbUserName.getText();
             String password = new String(dbPassword.getPassword());
-
-            ClassLoader cloader = new URLClassLoader(new URL[]{new File(driverlib).toURI().toURL()});
-            DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(driver, true, cloader).newInstance()));
 
             Session session = new Session(url, user, password);
             Connection connection = session.getConnection();
@@ -209,7 +207,6 @@ public class DatabasePanelController implements Initializable, BaseController {
                 alert.getButtonTypes().setAll(buttonExit);
                 Optional<ButtonType> result = alert.showAndWait();
             }
-        } catch (InstantiationException | IllegalAccessException | MalformedURLException | ClassNotFoundException e) {
         } catch (SQLException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Connection Error");
@@ -219,6 +216,7 @@ public class DatabasePanelController implements Initializable, BaseController {
             alert.getButtonTypes().setAll(buttonExit);
             Optional<ButtonType> result = alert.showAndWait();
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

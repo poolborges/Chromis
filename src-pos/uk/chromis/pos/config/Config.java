@@ -64,8 +64,7 @@ public class Config extends Application {
             root = loader.load();
         } catch (IOException ex) {
             System.out.println("Error trying to load Start Config");
-            System.out.println("*********************************");
-            System.out.println(ex);
+            ex.printStackTrace();
         }
         ConfigurationController controller = loader.getController();
         scene = new Scene(root, 800, 580);
@@ -89,9 +88,10 @@ public class Config extends Application {
 
     private void loadStyle(Scene node) {
        try {
-            final String resource = Paths.get(System.getProperty("user.dir") + "/cssStyles/Chromis.css").toUri().toURL().toExternalForm();
+            final String resource = getClass().getResource("/Chromis.css").toExternalForm();
+            //final String resource = Paths.get(System.getProperty("user.dir") + "Chromis.css").toUri().toURL().toExternalForm();
             node.getStylesheets().add(resource);
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             System.out.println("No Chromis.css File found !");
         }
     }
