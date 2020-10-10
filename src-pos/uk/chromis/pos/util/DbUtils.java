@@ -86,25 +86,12 @@ public class DbUtils {
     }
 
     public static Connection getConnection() {
-//        String sDBUser = AppConfig.getInstance().getProperty("db.user");
-//        String sDBPassword = AppConfig.getInstance().getProperty("db.password");
-//        if (sDBUser != null && sDBPassword != null && sDBPassword.startsWith("crypt:")) {
-//            cypher = new AltEncrypter("cypherkey" + sDBUser);
-//            sDBPassword = cypher.decrypt(sDBPassword.substring(6));
-//        }
-//        try {
-            return  ConnectionFactory.getInstance().getConnection();
-//        } catch (SQLException ex) {
-//            return null;
-//        }
+       return  ConnectionFactory.getInstance().getConnection();
     }
 
     public static void checkJava() {
         String sJavaVersion = System.getProperty("java.vm.specification.version");
         double dJavaVersion = Double.parseDouble(sJavaVersion);
-        //String sJavaVersion = System.getProperty("java.version");
-        //double dJavaVersion = Double.parseDouble(sJavaVersion.substring(0, sJavaVersion.indexOf('.', sJavaVersion.indexOf('.') + 1)));
-
 
         if (dJavaVersion < 1.8) {
             StartupDialog dialog = new StartupDialog();
