@@ -22,20 +22,12 @@
  */
 package uk.chromis.data.loader;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.SQLException;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.chromis.pos.forms.AppConfig;
-import uk.chromis.pos.forms.DriverWrapper;
 import uk.chromis.pos.util.AltEncrypter;
 
 /**
@@ -49,7 +41,7 @@ public class ConnectionFactory {
     private static Boolean dbValid = false;
     private static Connection connection;
     private static String db_user;
-    private static String db_password;  
+    private static String db_password;
     private static String db_url;
 
     private ConnectionFactory() {
@@ -75,23 +67,20 @@ public class ConnectionFactory {
     }
 
     public Connection getConnection() {
-        if (connection != null) {
-            return connection;
-        }
         try {
-            ClassLoader cloader = new URLClassLoader(new URL[]{new File(AppConfig.getInstance().getProperty("db.driverlib")).toURI().toURL()});
-            DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig.getInstance().getProperty("db.driver"), true, cloader).newInstance()));
+            if (connection != null) {
+                return connection;
+            }
+            
             connection = (Connection) DriverManager.getConnection(db_url, db_user, db_password);
             return connection;
         } catch (SQLException ex) {
-
-        } catch (MalformedURLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(ConnectionFactory.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
 
-    public Boolean isDbValid(){
+    public Boolean isDbValid() {
         getConnection();
         return dbValid;
     }
