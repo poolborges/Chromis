@@ -73,6 +73,7 @@ import uk.chromis.basic.BasicException;
 import uk.chromis.beans.JFlowPanel;
 import uk.chromis.beans.JPasswordDialog;
 import uk.chromis.data.gui.MessageInf;
+import uk.chromis.data.loader.ConnectionFactory;
 import uk.chromis.data.loader.Session;
 import uk.chromis.format.Formats;
 import uk.chromis.pos.dialogs.JOpenWarningDlg;
@@ -120,9 +121,6 @@ public class JRootApp extends JPanel implements AppView {
     private SimpleDateFormat formatter;
     private MessageInf msg;
 
-    private String db_user;
-    private String db_url;
-    private String db_password;
 
     static {
         m_oldclasses = new HashMap<>();
@@ -151,17 +149,6 @@ public class JRootApp extends JPanel implements AppView {
      * Creates new form JRootApp
      */
     public JRootApp() {
-              
-        // get some default settings 
-        db_user = (AppConfig.getInstance().getProperty("db.user"));
-        db_url = (AppConfig.getInstance().getProperty("db.URL"));
-        db_password = (AppConfig.getInstance().getProperty("db.password"));
-
-        if (db_user != null && db_password != null && db_password.startsWith("crypt:")) {
-            // the password is encrypted
-            AltEncrypter cypher = new AltEncrypter("cypherkey" + db_user);
-            db_password = cypher.decrypt(db_password.substring(6));
-        }
 
         m_aBeanFactories = new HashMap<>();
         // Inicializo los componentes visuales
@@ -915,17 +902,13 @@ public class JRootApp extends JPanel implements AppView {
         try {
             user = m_dlSystem.getsuperuser();
             if (user == null) {
-                ClassLoader cloader = new URLClassLoader(new URL[]{new File(AppConfig.getInstance().getProperty("db.driverlib")).toURI().toURL()});
-                DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig.getInstance().getProperty("db.driver"), true, cloader).newInstance()));
-                Class.forName(AppConfig.getInstance().getProperty("db.driver"));
-                con = DriverManager.getConnection(db_url, db_user, db_password);
+               con = ConnectionFactory.getInstance().getConnection();
                 PreparedStatement stmt = con.prepareStatement("INSERT INTO PEOPLE (ID, NAME, ROLE, VISIBLE) VALUES ('99', 'SuperAdminUser', (select id from roles where name = 'Administrator role'), true)");
                 stmt.executeUpdate();
                 user = m_dlSystem.getsuperuser();
 
             }
-        } catch (BasicException e) {
-        } catch (SQLException | MalformedURLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+        } catch (BasicException | SQLException ex) {
             Logger.getLogger(JRootApp.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
