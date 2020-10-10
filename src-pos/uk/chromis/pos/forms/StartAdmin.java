@@ -27,10 +27,7 @@ import java.net.ServerSocket;
 import java.util.Locale;
 import java.util.logging.Logger;
 import uk.chromis.format.Formats;
-import uk.chromis.pos.dbmanager.RunRepair;
 import uk.chromis.pos.ticket.TicketInfo;
-import uk.chromis.pos.util.AltEncrypter;
-import uk.chromis.pos.util.DbUtils;
 
 public class StartAdmin {
 
@@ -54,26 +51,14 @@ public class StartAdmin {
         if (!registerApp()) {
             System.exit(0);
         }
-
         
-        /*
-        DbUtils.checkJava();
-        DatabaseManager dbMan = new DatabaseManager();
-        dbMan.checkDatabase();
-        */
         startApp();
 
     }
 
     public static void startApp() {
-        // check if there are any repair scripts to run       
-        String db_password = (AppConfig.getInstance().getProperty("db.password"));
-        if (AppConfig.getInstance().getProperty("db.user") != null && db_password != null && db_password.startsWith("crypt:")) {
-            AltEncrypter cypher = new AltEncrypter("cypherkey" + AppConfig.getInstance().getProperty("db.user"));
-            db_password = cypher.decrypt(db_password.substring(6));
-        }
-
-       // RunRepair.Process(AppConfig.getInstance().getProperty("db.user"), AppConfig.getInstance().getProperty("db.URL"), db_password);
+        // check if there are any repair scripts to run   
+       //RunRepair.Process();
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
