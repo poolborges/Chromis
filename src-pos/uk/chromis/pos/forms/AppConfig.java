@@ -35,7 +35,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,6 +53,7 @@ public class AppConfig implements AppProperties {
 
     class SortedProperties extends Properties {
 
+        @Override
         public Enumeration keys() {
             Enumeration keysEnum = super.keys();
             Vector<String> keyList = new Vector<String>();
@@ -69,7 +69,6 @@ public class AppConfig implements AppProperties {
         this.configFile = configFile;
         m_propsconfig = new Properties();
         load();
-        logger.log(Level.INFO, "Reading configuration file: {0}", configFile.getAbsolutePath());
     }
 
     public static AppConfig getInstance() {
@@ -83,7 +82,7 @@ public class AppConfig implements AppProperties {
         return new File(new File(System.getProperty("user.home")), AppLocal.APP_ID + ".properties");
     }
 
-    public String getDirPath() {
+    public static String getDirPath() {
         String dirname = System.getProperty("dirname.path");
         return (dirname == null ? "./" : dirname);
     }
@@ -128,15 +127,26 @@ public class AppConfig implements AppProperties {
     }
 
     public void load() {
+
+        logger.log(Level.INFO, "Reading configuration file: {0}", configFile.getAbsolutePath());
+
         loadDefault();
         try {
             InputStream in = new FileInputStream(configFile);
             if (in != null) {
                 m_propsconfig.load(in);
                 in.close();
+            } else {
+                logger.log(Level.WARNING, "Faild to read configuration file: {0}", configFile.getAbsolutePath());
             }
         } catch (IOException e) {
-            loadDefault();
+            try {
+                logger.log(Level.INFO, "Storing default configuration to file: {0}", configFile.getAbsolutePath());
+                loadDefault();
+                save();
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "Fail storing default configuration", ex);
+            }
         }
     }
 
@@ -184,16 +194,15 @@ public class AppConfig implements AppProperties {
     }
 
     private void loadDefault() {
-/*
-        String dirname = System.getProperty("dirname.path");
-        dirname = dirname == null ? "./" : dirname;
+        
+        String dirname = getDirPath();
 
         m_propsconfig.setProperty("db.driverlib", new File(new File(dirname), "lib/derby.jar").getAbsolutePath());
         m_propsconfig.setProperty("db.driver", "org.apache.derby.jdbc.EmbeddedDriver");
         m_propsconfig.setProperty("db.URL", "jdbc:derby:" + new File(new File(System.getProperty("user.home")), AppLocal.APP_ID + "-database").getAbsolutePath() + ";create=true");
         m_propsconfig.setProperty("db.user", "");
         m_propsconfig.setProperty("db.password", "");
-*/
+        
         /**
          *
          * Default component settings
