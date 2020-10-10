@@ -58,7 +58,7 @@ public class ProcessLiquibase {
     static final Dimension SCREEN_DIMENSION = Toolkit.getDefaultToolkit().getScreenSize();
 
     public static Boolean DBFAILED = true;
-    private static Connection con;
+    
     private static PreparedStatement stmt2;
 
     public ProcessLiquibase() {
@@ -76,10 +76,9 @@ public class ProcessLiquibase {
         }
 
         Liquibase liquibase = null;
+        Connection con = null;
         try {
-            Connection con =  ConnectionFactory.getInstance().getConnection();
-            ClassLoader cloader = new URLClassLoader(new URL[]{new File(AppConfig.getInstance().getProperty("db.driverlib")).toURI().toURL()});
-            DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig.getInstance().getProperty("db.driver"), true, cloader).newInstance()));
+              con = ConnectionFactory.getInstance().getConnection();
 // lets check if the database has passed new database test
             try {
 
@@ -125,7 +124,7 @@ public class ProcessLiquibase {
             DBFAILED = false;
             
             
-        } catch (DatabaseException | MalformedURLException | SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+        } catch (DatabaseException | SQLException  ex) {
             Logger.getLogger(ProcessLiquibase.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         } catch (LiquibaseException ex) {

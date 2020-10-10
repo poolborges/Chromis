@@ -204,16 +204,7 @@ public class DbManager {
 
     private boolean testConnection() {
 
-        try {
-            ClassLoader cloader = new URLClassLoader(new URL[]{new File(AppConfig.getInstance().getProperty("db.driverlib")).toURI().toURL()});
-            DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig.getInstance().getProperty("db.driver"), true, cloader).newInstance()));
-        } catch (ClassNotFoundException | MalformedURLException | InstantiationException | IllegalAccessException | SQLException ex) {
-            Logger.getLogger(DbManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-
-        Connection connection = null;
-            connection = ConnectionFactory.getInstance().getConnection();
+        Connection connection = ConnectionFactory.getInstance().getConnection();
         if (connection == null) {
         } else {
             connectTest.setVisible(false);

@@ -35,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import uk.chromis.data.loader.ConnectionFactory;
 import uk.chromis.pos.util.AltEncrypter;
 
 /**
@@ -43,9 +44,6 @@ import uk.chromis.pos.util.AltEncrypter;
  */
 public class UpdateTicketType {
 
-    private static String db_user;
-    private static String db_url;
-    private static String db_password;
     private static Connection con;
     private static ResultSet rs;
     private static Statement stmt;
@@ -59,19 +57,8 @@ public class UpdateTicketType {
 
     public static void updateTicketType() {
 
-        db_user = (AppConfig.getInstance().getProperty("db.user"));
-        db_url = (AppConfig.getInstance().getProperty("db.URL"));
-        db_password = (AppConfig.getInstance().getProperty("db.password"));
-        if (db_user != null && db_password != null && db_password.startsWith("crypt:")) {
-            AltEncrypter cypher = new AltEncrypter("cypherkey" + db_user);
-            db_password = cypher.decrypt(db_password.substring(6));
-        }
-
         try {
-            ClassLoader cloader = new URLClassLoader(new URL[]{new File(AppConfig.getInstance().getProperty("db.driverlib")).toURI().toURL()});
-            DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig.getInstance().getProperty("db.driver"), true, cloader).newInstance()));
-            Class.forName(AppConfig.getInstance().getProperty("db.driver"));
-            con = DriverManager.getConnection(db_url, db_user, db_password);
+            con = ConnectionFactory.getInstance().getConnection();
             stmt = (Statement) con.createStatement();
 
             // Convert the resourse pointers

@@ -41,6 +41,7 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import uk.chromis.data.loader.ConnectionFactory;
 import uk.chromis.pos.forms.AppConfig;
 import uk.chromis.pos.forms.DriverWrapper;
 import uk.chromis.pos.util.AltEncrypter;
@@ -349,22 +350,11 @@ public class ResetDialog extends javax.swing.JPanel {
 
     private Connection getConnection() {
         try {
-            db_user = (AppConfig.getInstance().getProperty("db.user"));
-            db_url = (AppConfig.getInstance().getProperty("db.URL"));
-            db_password = (AppConfig.getInstance().getProperty("db.password"));
-            if (db_user != null && db_password != null && db_password.startsWith("crypt:")) {
-                AltEncrypter cypher = new AltEncrypter("cypherkey" + db_user);
-                db_password = cypher.decrypt(db_password.substring(6));
-            }
-
-            ClassLoader cloader = new URLClassLoader(new URL[]{new File(AppConfig.getInstance().getProperty("db.driverlib")).toURI().toURL()});
-            DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig.getInstance().getProperty("db.driver"), true, cloader).newInstance()));
-            Class.forName(AppConfig.getInstance().getProperty("db.driver"));
-            Connection con = DriverManager.getConnection(db_url, db_user, db_password);
+            Connection con = ConnectionFactory.getInstance().getConnection();
             con.setAutoCommit(true);
             return con;
 
-        } catch (MalformedURLException | SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(ResetDialog.class
                     .getName()).log(Level.SEVERE, null, ex);
         }

@@ -41,6 +41,7 @@ import liquibase.exception.CustomChangeException;
 import liquibase.exception.SetupException;
 import liquibase.exception.ValidationErrors;
 import liquibase.resource.ResourceAccessor;
+import uk.chromis.data.loader.ConnectionFactory;
 import uk.chromis.data.loader.Session;
 import uk.chromis.pos.forms.AppConfig;
 import uk.chromis.pos.forms.DriverWrapper;
@@ -73,15 +74,10 @@ public class UpdateKeysIndexes implements liquibase.change.custom.CustomTaskChan
             db_password = cypher.decrypt(db_password.substring(6));
         }
 
-        ClassLoader cloader;
-        Connection conn = null;
+        Connection conn = ConnectionFactory.getInstance().getConnection();;
         PreparedStatement pstmt;
 
         try {
-            cloader = new URLClassLoader(new URL[]{new File(AppConfig.getInstance().getProperty("db.driverlib")).toURI().toURL()});
-            DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig.getInstance().getProperty("db.driver"), true, cloader).newInstance()));
-            Session session = new Session(db_url, db_user, db_password);
-            conn = session.getConnection();
 
             md = conn.getMetaData();
 
@@ -152,7 +148,7 @@ public class UpdateKeysIndexes implements liquibase.change.custom.CustomTaskChan
                     }
                 }
             }
-        } catch (MalformedURLException | SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(UpdateKeysIndexes.class.getName()).log(Level.SEVERE, null, ex);
         }
 

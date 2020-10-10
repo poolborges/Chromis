@@ -36,10 +36,11 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import uk.chromis.data.loader.ConnectionFactory;
 
 public class RunRepair {
 
-    public static void Process(String db_user, String db_url, String db_password) {        
+    public static void Process() {        
         String s; // = new String();
         StringBuilder sb = new StringBuilder();
         Connection con = null;
@@ -54,10 +55,7 @@ public class RunRepair {
         }
 
         try {
-            ClassLoader cloader = new URLClassLoader(new URL[]{new File(AppConfig.getInstance().getProperty("db.driverlib")).toURI().toURL()});
-            DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig.getInstance().getProperty("db.driver"), true, cloader).newInstance()));
-            Class.forName(AppConfig.getInstance().getProperty("db.driver"));
-            con = DriverManager.getConnection(db_url, db_user, db_password);
+            con = ConnectionFactory.getInstance().getConnection();
             Statement stmt = (Statement) con.createStatement();
 
             BufferedReader br = new BufferedReader(fr);
@@ -75,7 +73,7 @@ public class RunRepair {
                 }
             }
             file.delete();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException | IOException e) {
+        } catch (SQLException | IOException e) {
             System.out.println("*** Error : " + e.toString());
             System.out.println("*** ");
             System.out.println("*** Error : ");
